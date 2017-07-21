@@ -58,8 +58,40 @@ int
 mon_backtrace(int argc, char **argv, struct Trapframe *tf)
 {
 	// Your code here.
+	uint32_t regebp,eip,arg1,arg2,arg3,i;
+	uint32_t *ebp;
+	regebp = read_ebp();
+	ebp = (uint32_t*)regebp;
+	cprintf("Stack backtrace:\n");
+
+	while((uint32_t)ebp != 0x0){
+		eip = *(ebp+1);
+		arg1 = *(ebp+2);
+		arg2 = *(ebp+3);
+		arg3 = *(ebp+4);
+		cprintf(" ebp %08x  eip %08x  args %08x %08x %08x\n",(uint32_t)ebp,eip,arg1,arg2,arg3);
+		ebp = (uint32_t*)*ebp;
+	}
 	return 0;
 }
+	/*uint32_t bp,ip,arg1,arg2,arg3,i;
+	bp=read_ebp();
+	ip=*((uint32_t*)bp+1);
+	arg1=*((uint32_t*)bp+2);
+	arg2=*((uint32_t*)bp+3);
+	arg3=*((uint32_t*)bp+4);
+	do{
+		cprintf("ebp %x  eip %x  args %x %x %x\n",bp,ip,arg1,arg2,arg3);
+		bp=*(uint32_t*)bp;
+		if(bp!=0){
+			ip=*((uint32_t*)bp+1);
+			arg1=*((uint32_t*)bp+2);
+			arg2=*((uint32_t*)bp+3);
+			arg3=*((uint32_t*)bp+4);
+		}
+	}while(bp!=0);
+	return 0;*/
+
 
 
 
@@ -115,7 +147,7 @@ monitor(struct Trapframe *tf)
 	cprintf("Welcome to the JOS kernel monitor!\n");
 	cprintf("Type 'help' for a list of commands.\n");
 
-
+	
 	while (1) {
 		buf = readline("K> ");
 		if (buf != NULL)

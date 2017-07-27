@@ -129,7 +129,7 @@ mem_init(void)
 	i386_detect_memory();
 
 	// Remove this line when you're ready to test this function.
-	panic("mem_init: This function is not finished\n");
+	//panic("mem_init: This function is not finished\n");
 
 	//////////////////////////////////////////////////////////////////////
 	// create initial page directory.
@@ -299,7 +299,19 @@ struct PageInfo *
 page_alloc(int alloc_flags)
 {
 	// Fill this function in
-	return 0;
+	struct PageInfo *alloced_page;
+	if(page_free_list == NULL){
+		return NULL;
+	}
+	alloced_page = page_free_list;
+	page_free_list = alloced_page->pp_link;
+	alloced_page->pp_link = NULL;
+	//alloced_page->pp_ref  +=1;
+	if(alloc_flags & ALLOC_ZERO){
+		memset(page2kva(alloced_page),'\0',PGSIZE);
+	}
+	
+	return alloced_page;
 }
 
 //
@@ -312,6 +324,10 @@ page_free(struct PageInfo *pp)
 	// Fill this function in
 	// Hint: You may want to panic if pp->pp_ref is nonzero or
 	// pp->pp_link is not NULL.
+	assert(pp->pp_ref == 0);
+	assert(pp->pp_link == NULL);
+	pp->pp_link = page_free_list;
+	page_free_list = pp;
 }
 
 //

@@ -83,6 +83,7 @@ trap_init(void)
 	extern void t_align();
 	extern void t_mchk();
 	extern void t_simderr();
+	extern void t_syscall();
 	
 	SETGATE(idt[T_DIVIDE],1,GD_KT,t_divide,0);
 	SETGATE(idt[T_DEBUG],1,GD_KT,t_debug,0);
@@ -102,6 +103,8 @@ trap_init(void)
 	SETGATE(idt[T_ALIGN],1,GD_KT,t_align,0);
 	SETGATE(idt[T_MCHK],1,GD_KT,t_mchk,0);
 	SETGATE(idt[T_SIMDERR],1,GD_KT,t_simderr,0);
+	
+	SETGATE(idt[T_SYSCALL],1,GD_KT,t_syscall,3); //权限设置为0时出现GP错误
 	// Per-CPU setup 
 	trap_init_percpu();
 }
@@ -179,12 +182,19 @@ trap_dispatch(struct Trapframe *tf)
 {
 	// Handle processor exceptions.
 	// LAB 3: Your code here.
+	int r;
 	switch(tf->tf_trapno){
 		case T_PGFLT:
 			page_fault_handler(tf);
 			break;
 		case T_BRKPT:
 			monitor(tf);
+			break;
+		case T_SYSCALL:
+			r = syscall(tf->tf_regs.reg_eax, tf->tf_regs.reg_edx, tf->tf_regs.reg_ecx, tf->tf_regs.reg_ebx, tf->tf_regs.reg_edi, tf->tf_regs.reg_esi);
+			if(r < 0)
+				panic("trap_dispatch: %e",r);
+			tf->tf_regs.reg_eax = r;
 			break;
 		default:
 	// Unexpected trap: The user process or the kernel has a bug.
@@ -248,7 +258,9 @@ page_fault_handler(struct Trapframe *tf)
 	// Handle kernel-mode page faults.
 
 	// LAB 3: Your code here.
-
+	//cprintf("tf_cs: 0x%x\n",tf->tf_cs);
+	if((tf->tf_cs & 3) == 0)
+		panic("page_fault_handler: kernel-mode page faults.");
 	// We've already handled kernel-mode exceptions, so if we get here,
 	// the page fault happened in user mode.
 

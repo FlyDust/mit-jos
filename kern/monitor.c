@@ -165,6 +165,7 @@ monitor(struct Trapframe *tf)
 //>>>>>>> lab2
 	while (1) {
 		buf = readline("K> ");
+		//tf->tf_eflags & 0x100;
 		if (buf != NULL)
 			if (runcmd(buf, tf) < 0)
 				break;

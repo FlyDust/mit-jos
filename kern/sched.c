@@ -29,25 +29,31 @@ sched_yield(void)
 	// below to halt the cpu.
 
 	// LAB 4: Your code here.
+	//cprintf("enter sched_yield.\n");
 	idle = thiscpu->cpu_env;
 	int i, n;
-	if(curenv != NULL){
+	if(idle != NULL){
+		//cprintf("enter idle != NULL\n");
 		n = NENV - 1;
 		i = (ENVX(idle->env_id) + 1) % NENV;
 	}
 	else{
+		//cprintf("enter idle = NULL\n");
 		n = NENV;
 		i = 0;
 	}
 	for( ; n > 0; n--){
 		if( envs[i].env_status == ENV_RUNNABLE){
+			//cprintf("find env: %8x\n",envs[i].env_id);
 			env_run(&envs[i]);
 			return;
 		}
 		i = (i + 1) % NENV;
 	}
-	if(idle->env_status == ENV_RUNNING){
+	//此处注意idle不为空的判断，否则会内核页错误中断，导致panic
+	if(idle !=NULL && idle->env_status == ENV_RUNNING){
 		env_run(idle);
+		//cprintf("run idle\n");
 		return;
 	}
 	// sched_halt never returns

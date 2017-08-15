@@ -333,6 +333,10 @@ page_init(void)
 			pages[i].pp_ref = 1;
 			pages[i].pp_link = NULL;
 		}
+		/*if(i >= 0 && i < npages_basemem + num_hole + num_alloc){
+			pages[i].pp_ref = 1;
+			pages[i].pp_link = NULL;
+		}*/
 		else if( i == MPENTRY_PADDR / PGSIZE){
 			pages[i].pp_ref = 1;
 			pages[i].pp_link = NULL;
@@ -511,6 +515,7 @@ page_insert(pde_t *pgdir, struct PageInfo *pp, void *va, int perm)
 		tlb_invalidate(pgdir,va);
 		page_remove(pgdir,va);
 	}
+	//tlb_invalidate(pgdir,va);
 	*pte = page2pa(pp) | perm |PTE_P;
 	//pgdir[PDX(va)] |= perm;
 	return 0;

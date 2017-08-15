@@ -91,6 +91,7 @@ envid2env(envid_t envid, struct Env **env_store, bool checkperm)
 	e = &envs[ENVX(envid)];
 	if (e->env_status == ENV_FREE || e->env_id != envid) {
 		*env_store = 0;
+		cprintf("[%8x] free bad env.%x\n", e->env_id,e->env_status);
 		return -E_BAD_ENV;
 	}
 
@@ -101,6 +102,7 @@ envid2env(envid_t envid, struct Env **env_store, bool checkperm)
 	// or an immediate child of the current environment.
 	if (checkperm && e != curenv && e->env_parent_id != curenv->env_id) {
 		*env_store = 0;
+		cprintf("perm bad env\n");
 		return -E_BAD_ENV;
 	}
 
@@ -480,8 +482,9 @@ env_destroy(struct Env *e)
 	}
 
 	env_free(e);
-
+	//cprintf("freed env.\n");
 	if (curenv == e) {
+		//cprintf("enter curenv==e.\n");
 		curenv = NULL;
 		sched_yield();
 	}
@@ -547,7 +550,9 @@ env_run(struct Env *e)
 		lcr3(PADDR(curenv->env_pgdir));
 	}
 	unlock_kernel();
+	//cprintf("run %8x.\n",e->env_id);
+	//cprintf("\tcurenv->env_id = %8x\n",curenv->env_id);
 	env_pop_tf(&(curenv->env_tf));
-	panic("env_run not yet implemented");
+//panic("env_run not yet implemented");
 }
 

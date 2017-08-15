@@ -90,28 +90,64 @@ trap_init(void)
 	extern void t_align();
 	extern void t_mchk();
 	extern void t_simderr();
+	
+	extern void irq0();
+	extern void irq1();
+	extern void irq2();
+	extern void irq3();
+	extern void irq4();
+	extern void irq5();
+	extern void irq6();
+	extern void irq7();
+	extern void irq8();
+	extern void irq9();
+	extern void irq10();
+	extern void irq11();
+	extern void irq12();
+	extern void irq13();
+	extern void irq14();
+	extern void irq15();
+	
 	extern void t_syscall();
-	
-	SETGATE(idt[T_DIVIDE],1,GD_KT,t_divide,0);
-	SETGATE(idt[T_DEBUG],1,GD_KT,t_debug,0);
+	//JOS中设定内核态下中断始终被屏蔽，因此第二个参数均为0，为从用户态转变为内核态时将IF置0
+	SETGATE(idt[T_DIVIDE],0,GD_KT,t_divide,0);
+	SETGATE(idt[T_DEBUG],0,GD_KT,t_debug,0);
 	SETGATE(idt[T_NMI],0,GD_KT,t_nmi,0);
-	SETGATE(idt[T_BRKPT],1,GD_KT,t_brkpt,3);
-	SETGATE(idt[T_OFLOW],1,GD_KT,t_oflow,0);
-	SETGATE(idt[T_BOUND],1,GD_KT,t_bound,0);
-	SETGATE(idt[T_ILLOP],1,GD_KT,t_illop,0);
-	SETGATE(idt[T_DEVICE],1,GD_KT,t_device,0);
-	SETGATE(idt[T_DBLFLT],1,GD_KT,t_dblflt,0);
-	SETGATE(idt[T_TSS],1,GD_KT,t_tss,0);
-	SETGATE(idt[T_SEGNP],1,GD_KT,t_segnp,0);
-	SETGATE(idt[T_STACK],1,GD_KT,t_stack,0);
-	SETGATE(idt[T_GPFLT],1,GD_KT,t_gpflt,0);
-	SETGATE(idt[T_PGFLT],1,GD_KT,t_pgflt,0);
-	SETGATE(idt[T_FPERR],1,GD_KT,t_fperr,0);
-	SETGATE(idt[T_ALIGN],1,GD_KT,t_align,0);
-	SETGATE(idt[T_MCHK],1,GD_KT,t_mchk,0);
-	SETGATE(idt[T_SIMDERR],1,GD_KT,t_simderr,0);
+	SETGATE(idt[T_BRKPT],0,GD_KT,t_brkpt,3);
+	SETGATE(idt[T_OFLOW],0,GD_KT,t_oflow,0);
+	SETGATE(idt[T_BOUND],0,GD_KT,t_bound,0);
+	SETGATE(idt[T_ILLOP],0,GD_KT,t_illop,0);
+	SETGATE(idt[T_DEVICE],0,GD_KT,t_device,0);
+	SETGATE(idt[T_DBLFLT],0,GD_KT,t_dblflt,0);
+	SETGATE(idt[T_TSS],0,GD_KT,t_tss,0);
+	SETGATE(idt[T_SEGNP],0,GD_KT,t_segnp,0);
+	SETGATE(idt[T_STACK],0,GD_KT,t_stack,0);
+	SETGATE(idt[T_GPFLT],0,GD_KT,t_gpflt,0);
+	SETGATE(idt[T_PGFLT],0,GD_KT,t_pgflt,0);
+	SETGATE(idt[T_FPERR],0,GD_KT,t_fperr,0);
+	SETGATE(idt[T_ALIGN],0,GD_KT,t_align,0);
+	SETGATE(idt[T_MCHK],0,GD_KT,t_mchk,0);
+	SETGATE(idt[T_SIMDERR],0,GD_KT,t_simderr,0);
 	
-	SETGATE(idt[T_SYSCALL],1,GD_KT,t_syscall,3); //权限设置为0时出现GP错误
+	SETGATE(idt[IRQ_OFFSET + 0],0,GD_KT,irq0,0);
+	SETGATE(idt[IRQ_OFFSET + 1],0,GD_KT,irq1,0);
+	SETGATE(idt[IRQ_OFFSET + 2],0,GD_KT,irq2,0);
+	SETGATE(idt[IRQ_OFFSET + 3],0,GD_KT,irq3,0);
+	SETGATE(idt[IRQ_OFFSET + 4],0,GD_KT,irq4,0);
+	SETGATE(idt[IRQ_OFFSET + 5],0,GD_KT,irq5,0);
+	SETGATE(idt[IRQ_OFFSET + 6],0,GD_KT,irq6,0);
+	SETGATE(idt[IRQ_OFFSET + 7],0,GD_KT,irq7,0);
+	SETGATE(idt[IRQ_OFFSET + 8],0,GD_KT,irq8,0);
+	SETGATE(idt[IRQ_OFFSET + 9],0,GD_KT,irq9,0);
+	SETGATE(idt[IRQ_OFFSET + 10],0,GD_KT,irq10,0);
+	SETGATE(idt[IRQ_OFFSET + 11],0,GD_KT,irq11,0);
+	SETGATE(idt[IRQ_OFFSET + 12],0,GD_KT,irq12,0);
+	SETGATE(idt[IRQ_OFFSET + 13],0,GD_KT,irq13,0);
+	SETGATE(idt[IRQ_OFFSET + 14],0,GD_KT,irq14,0);
+	SETGATE(idt[IRQ_OFFSET + 15],0,GD_KT,irq15,0);
+	
+	SETGATE(idt[T_SYSCALL],0,GD_KT,t_syscall,3); //权限设置为0时出现GP错误
+	
 	// Per-CPU setup 
 	trap_init_percpu();
 }
@@ -224,8 +260,22 @@ trap_dispatch(struct Trapframe *tf)
 {
 	// Handle processor exceptions.
 	// LAB 3: Your code here.
-//<<<<<<< HEAD
-
+	int r;
+	if(tf->tf_trapno == T_PGFLT){
+		page_fault_handler(tf);
+		return;
+	}
+	if(tf->tf_trapno == T_BRKPT){
+		monitor(tf);
+		return;
+	}
+	if(tf->tf_trapno == T_SYSCALL){
+		r = syscall(tf->tf_regs.reg_eax, tf->tf_regs.reg_edx, tf->tf_regs.reg_ecx, tf->tf_regs.reg_ebx, tf->tf_regs.reg_edi, tf->tf_regs.reg_esi);
+		/*if(r < 0)
+			panic("trap_dispatch: %e",r);*/
+		tf->tf_regs.reg_eax = r;
+		return;
+	}
 	// Handle spurious interrupts
 	// The hardware sometimes raises these because of noise on the
 	// IRQ line or other reasons. We don't care.
@@ -238,32 +288,18 @@ trap_dispatch(struct Trapframe *tf)
 	// Handle clock interrupts. Don't forget to acknowledge the
 	// interrupt using lapic_eoi() before calling the scheduler!
 	// LAB 4: Your code here.
-
-//=======
-	int r;
-	switch(tf->tf_trapno){
-		case T_PGFLT:
-			page_fault_handler(tf);
-			break;
-		case T_BRKPT:
-			monitor(tf);
-			break;
-		case T_SYSCALL:
-			r = syscall(tf->tf_regs.reg_eax, tf->tf_regs.reg_edx, tf->tf_regs.reg_ecx, tf->tf_regs.reg_ebx, tf->tf_regs.reg_edi, tf->tf_regs.reg_esi);
-			if(r < 0)
-				panic("trap_dispatch: %e",r);
-			tf->tf_regs.reg_eax = r;
-			break;
-		default:
-//>>>>>>> lab3
+	if(tf->tf_trapno == IRQ_OFFSET + IRQ_TIMER){
+		lapic_eoi();
+		sched_yield();
+		return;
+	}
 	// Unexpected trap: The user process or the kernel has a bug.
-			print_trapframe(tf);
-			if (tf->tf_cs == GD_KT)
-				panic("unhandled trap in kernel");
-			else {
-				env_destroy(curenv);
-				return;
-			}
+	print_trapframe(tf);
+	if (tf->tf_cs == GD_KT)
+		panic("unhandled trap in kernel");
+	else {
+		env_destroy(curenv);
+		return;
 	}
 }
 
@@ -286,6 +322,7 @@ trap(struct Trapframe *tf)
 	// Check that interrupts are disabled.  If this assertion
 	// fails, DO NOT be tempted to fix it by inserting a "cli" in
 	// the interrupt path.
+	//cprintf("trapno = %d\n",tf->tf_trapno);
 	assert(!(read_eflags() & FL_IF));
 
 	if ((tf->tf_cs & 3) == 3) {

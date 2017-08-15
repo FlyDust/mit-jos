@@ -35,4 +35,22 @@ umain(int argc, char **argv)
 {
 	forktree("");
 }
+/*#include <inc/lib.h>
+void umain(int argc,char **argv)
+{
+	cprintf("hi,father\n");
+	cprintf("%04x\n", sys_getenvid());
+	int id1,id2;
+	id1 = fork();
+	id2 = fork();
+	if(id1==0){
+		cprintf("hi,son1\n");
+		cprintf("%04x\n", sys_getenvid());
+	}
+	if(id2==0){
+		cprintf("hi,son2\n");
+		cprintf("%04x\n", sys_getenvid());
+		exit();
+	}
+}*/
 

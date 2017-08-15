@@ -120,7 +120,7 @@ fork(void)
 		if(((pde_t*)uvpd)[i] & PTE_P){
 			for(j = 0; j < NPTENTRIES; j++){
 				pn = PGNUM(PGADDR(i, j, 0));
-				if(pn == PGNUM(KSTACKTOP - PGSIZE))
+				if(pn == PGNUM(UXSTACKTOP - PGSIZE)) //注意此步为跳过异常堆栈页
 					break;
 				if(((pte_t*)uvpt)[pn] & PTE_P)
 					if((r = duppage(envid, pn)) < 0)

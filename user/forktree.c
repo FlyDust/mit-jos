@@ -1,6 +1,6 @@
 // Fork a binary tree of processes and display their structure.
 
-/*#include <inc/lib.h>
+#include <inc/lib.h>
 
 #define DEPTH 3
 
@@ -34,8 +34,8 @@ void
 umain(int argc, char **argv)
 {
 	forktree("");
-}*/
-#include <inc/lib.h>
+}
+/*#include <inc/lib.h>
 void umain(int argc,char **argv)
 {
 	cprintf("hi,father\n");
@@ -52,5 +52,5 @@ void umain(int argc,char **argv)
 		cprintf("%04x\n", sys_getenvid());
 		exit();
 	}
-}
+}*/
 

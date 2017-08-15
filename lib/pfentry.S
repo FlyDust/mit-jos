@@ -76,6 +76,7 @@ _pgfault_upcall:
 	// can no longer modify any general-purpose registers.
 	// LAB 4: Your code here.
 	movl %eax, %esp
+	subl $4, 40(%esp)
 	popal
 	// Restore eflags from the stack.  After you do this, you can
 	// no longer use arithmetic operations or anything else that
@@ -87,7 +88,8 @@ _pgfault_upcall:
 	// LAB 4: Your code here.
 	popl %esp
 	//由于之前将trap-time eip入栈，因此需将esp-4
-	subl $4, %esp
+	//由于不能修改eflags，此步应提前做
+	//subl $4, %esp
 	// Return to re-execute the instruction that faulted.
 	// LAB 4: Your code here.
 	ret

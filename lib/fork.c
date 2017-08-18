@@ -68,7 +68,12 @@ duppage(envid_t envid, unsigned pn)
 	//panic("duppage not implemented");
 	//uint32_t perm;
 	//perm = PGOFF(((pte_t*)uvpt)[pn]);
-	if(((pte_t*)uvpt)[pn] & (PTE_W | PTE_COW)){
+	pte_t pte = ((pte_t*)uvpt)[pn];
+	if(pte & PTE_SHARE){
+		if((r = sys_page_map(0, (void*)(pn * PGSIZE), envid, (void*)(pn * PGSIZE), pte & PTE_SYSCALL)) < 0)
+			return r;
+	}
+	else if(pte & (PTE_W | PTE_COW)){
 		//perm = perm &(~PTE_W);
 		if((r = sys_page_map(0, (void*)(pn * PGSIZE), envid, (void*)(pn * PGSIZE), PTE_P |PTE_U| PTE_COW)) < 0)
 			return r;

@@ -462,7 +462,7 @@ pgdir_walk(pde_t *pgdir, const void *va, int create)
 // This function is only intended to set up the ``static'' mappings
 // above UTOP. As such, it should *not* change the pp_ref field on the
 // mapped pages.
-//
+//PTE_ADDR
 // Hint: the TA solution uses pgdir_walk
 static void
 boot_map_region(pde_t *pgdir, uintptr_t va, size_t size, physaddr_t pa, int perm)
@@ -472,7 +472,7 @@ boot_map_region(pde_t *pgdir, uintptr_t va, size_t size, physaddr_t pa, int perm
 	pte_t *pte=NULL;
 	for(i = 0; i < size/PGSIZE; i++){
 		pte = pgdir_walk(pgdir, (void *)va, 1);
-		*pte = pa | perm | PTE_P;
+		*pte = PTE_ADDR(pa) | perm | PTE_P;
 		pa += PGSIZE;
 		va +=PGSIZE;
 	}

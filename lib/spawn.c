@@ -128,14 +128,11 @@ spawn(const char *prog, const char **argv)
 	// Copy shared library state.
 	if ((r = copy_shared_pages(child)) < 0)
 		panic("copy_shared_pages: %e", r);
-
 	child_tf.tf_eflags |= FL_IOPL_3;   // devious: see user/faultio.c
 	if ((r = sys_env_set_trapframe(child, &child_tf)) < 0)
 		panic("sys_env_set_trapframe: %e", r);
-
 	if ((r = sys_env_set_status(child, ENV_RUNNABLE)) < 0)
 		panic("sys_env_set_status: %e", r);
-
 	return child;
 
 error:
@@ -302,6 +299,23 @@ static int
 copy_shared_pages(envid_t child)
 {
 	// LAB 5: Your code here.
+	int r, i, j;
+	unsigned pn;
+	for(i = PDX(UTEXT); i < PDX(UTOP); i++){
+		if(((pde_t*)uvpd)[i] & (PTE_P)){
+			for(j = 0; j < NPTENTRIES; j++){
+				pn = PGNUM(PGADDR(i, j, 0));
+				if(pn == PGNUM(UXSTACKTOP - PGSIZE)) //注意此步为跳过异常堆栈页
+					break;
+				if((((pte_t*)uvpt)[pn] & (PTE_P| PTE_SHARE)) == (PTE_P | PTE_SHARE)){
+					//cprintf("loop %x\n",pn);
+					//cprintf("uvpt[0x%x] = %x,%x\n",pn,((pte_t*)uvpt)[pn],((pte_t*)uvpt)[pn] & (PTE_P| PTE_SHARE));
+					if((r = sys_page_map(0 ,(void *)(pn * PGSIZE), child, (void*)(pn * PGSIZE), ((pte_t*)uvpt)[pn] & PTE_SYSCALL)) < 0)
+						return r;
+				}
+			}
+		}
+	}
 	return 0;
 }
 

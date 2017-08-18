@@ -6,7 +6,7 @@
 // Comment this to disable spinlock debugging
 #define DEBUG_SPINLOCK
 
-// Mutual exclusion lock.
+// Mutual exclusion lock. 互斥锁
 struct spinlock {
 	unsigned locked;       // Is the lock held?
 

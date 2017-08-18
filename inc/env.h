@@ -12,7 +12,7 @@ typedef int32_t envid_t;
 // An environment ID 'envid_t' has three parts:
 //
 // +1+---------------21-----------------+--------10--------+
-// |0|          Uniqueifier             |   Environment    |
+// |0|           Uniquifier             |   Environment    |
 // | |                                  |      Index       |
 // +------------------------------------+------------------+
 //                                       \--- ENVX(eid) --/

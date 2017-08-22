@@ -31,6 +31,10 @@ struct pci_driver pci_attach_class[] = {
 // pci_attach_vendor matches the vendor ID and device ID of a PCI device. key1
 // and key2 should be the vendor ID and device ID respectively
 struct pci_driver pci_attach_vendor[] = {
+	//Add an entry to the pci_attach_vendor array to trigger your function if a matching PCI device is found
+	// (be sure to put it before the {0, 0, 0} entry that mark the end of the table)
+	//lab6 code:
+	{ E1000_VENDOR_ID, E1000_DEV_ID_82540EM, &e1000_attach },
 	{ 0, 0, 0 },
 };
 

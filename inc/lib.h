@@ -22,6 +22,8 @@
 #include <inc/args.h>
 #include <inc/malloc.h>
 #include <inc/ns.h>
+//#include <inc/e1000.h>
+#include "e1000.h"
 
 #define USED(x)		(void)(x)
 
@@ -60,6 +62,7 @@ int	sys_page_unmap(envid_t env, void *pg);
 int	sys_ipc_try_send(envid_t to_env, uint32_t value, void *pg, int perm);
 int	sys_ipc_recv(void *rcv_pg);
 unsigned int sys_time_msec(void);
+int sys_e1000_trans(struct tx_desc *td);
 
 // This must be inlined.  Exercise for reader: why?
 static inline envid_t __attribute__((always_inline))

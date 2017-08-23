@@ -122,3 +122,11 @@ sys_time_msec(void)
 {
 	return (unsigned int) syscall(SYS_time_msec, 0, 0, 0, 0, 0, 0);
 }
+
+//e1000 transmit packets
+//lab6 code:
+int
+sys_e1000_trans(struct tx_desc *td)
+{
+	return syscall(SYS_e1000_trans, 0, (uint32_t)td, 0, 0, 0, 0);
+}

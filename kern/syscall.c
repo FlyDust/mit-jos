@@ -12,6 +12,8 @@
 #include <kern/console.h>
 #include <kern/sched.h>
 #include <kern/time.h>
+//lab6 , add e1000.h
+#include <kern/e1000.h>
 
 // Print a string to the system console.
 // The string is exactly 'len' characters long.
@@ -168,6 +170,7 @@ sys_env_set_pgfault_upcall(envid_t envid, void *func)
 	struct Env *myenv;
 	if((r = envid2env(envid, &myenv, 1)) < 0)
 		return r;
+	user_mem_assert(myenv, func, sizeof(func), PTE_U);
 	myenv->env_pgfault_upcall = func;
 	return  0;
 }
@@ -406,6 +409,15 @@ sys_time_msec(void)
 	return time_msec();
 }
 
+//e1000 transmit packets
+//lab6 code:
+static int
+sys_e1000_trans(struct tx_desc *td){
+	user_mem_assert(curenv, td, sizeof(td), PTE_U);
+	return e1000_transmit(td);
+	//return 0;
+}
+
 // Dispatches to the correct kernel function, passing the arguments.
 int32_t
 syscall(uint32_t syscallno, uint32_t a1, uint32_t a2, uint32_t a3, uint32_t a4, uint32_t a5)
@@ -447,6 +459,8 @@ syscall(uint32_t syscallno, uint32_t a1, uint32_t a2, uint32_t a3, uint32_t a4, 
 		return sys_env_set_trapframe((envid_t)a1, (struct Trapframe *)a2);
 	case SYS_time_msec:
 		return sys_time_msec();
+	case SYS_e1000_trans:
+		return sys_e1000_trans((struct tx_desc*)a1);
 	default:
 		return -E_INVAL;
 	}

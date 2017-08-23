@@ -53,14 +53,13 @@ e1000_attach(struct pci_func *pcif){
 	e1000[E1000_TIPG/4] = tipg_flag;
 	
 	//test transmit
-	struct tx_desc mytd = {0x271f00, 0x2a, 0, 0x90, 0,0, 0};
-	memset((void*)0x271f00, 1, 100);
+	/*struct tx_desc mytd = {0xf0271f00, 0x2a, 0, 0x9, 0,0, 0};
 	while(1){
 		if(e1000_transmit(&mytd) < 0)
 			continue;
 		else
 			return 0;
-	}
+	}*/
 	return 0;
 }
 
@@ -68,10 +67,13 @@ int
 e1000_transmit(struct tx_desc *td){
 	struct tx_desc *ntd = tx_desc_list + *e1000_tdt;
 	if((ntd->status & (E1000_TXD_STAT_DD >> E1000_TXD_STAT_SHIFT)) == 0){
+		cprintf("transmit descriptor list is full\n");
 		return -1;
 	}
 	*ntd = *td;
-	//ntd->cmd |= (E1000_TXD_CMD_RS >> E1000_TXD_CMD_SHIFT);
+	memmove((void*)pack_buf[*e1000_tdt], (void*)(uint32_t)ntd->addr, MAXPACKETSIZE);
+	ntd->addr = PADDR(pack_buf[*e1000_tdt]);
+	ntd->cmd |= (E1000_TXD_CMD_RS >> E1000_TXD_CMD_SHIFT);
 	*e1000_tdt = (*e1000_tdt + 1) % MAXTDLLEN; 
 	return 0;
 }

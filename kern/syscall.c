@@ -409,13 +409,19 @@ sys_time_msec(void)
 	return time_msec();
 }
 
-//e1000 transmit packets
+//e1000 transmit/receive packets
 //lab6 code:
 static int
 sys_e1000_trans(struct tx_desc *td){
 	user_mem_assert(curenv, td, sizeof(td), PTE_U);
 	return e1000_transmit(td);
 	//return 0;
+}
+
+static int
+sys_e1000_recv(struct rx_desc *rd){
+	user_mem_assert(curenv, rd, sizeof(rd), PTE_U | PTE_W);
+	return e1000_receive(rd);
 }
 
 // Dispatches to the correct kernel function, passing the arguments.
@@ -461,6 +467,8 @@ syscall(uint32_t syscallno, uint32_t a1, uint32_t a2, uint32_t a3, uint32_t a4, 
 		return sys_time_msec();
 	case SYS_e1000_trans:
 		return sys_e1000_trans((struct tx_desc*)a1);
+	case SYS_e1000_recv:
+		return sys_e1000_recv((struct rx_desc*)a1);
 	default:
 		return -E_INVAL;
 	}

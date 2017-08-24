@@ -18,8 +18,9 @@ enum {
 	SYS_ipc_try_send,
 	SYS_ipc_recv,
 	SYS_time_msec,
-	//lab6 transmit packet syscall
+	//lab6 transmit/receive packet syscall
 	SYS_e1000_trans,
+	SYS_e1000_recv,
 	NSYSCALLS
 };
 

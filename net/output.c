@@ -12,7 +12,7 @@ output(envid_t ns_envid)
 	//	- send the packet to the device driver
 	uint32_t req, whom;
 	int r;
-	struct tx_desc td = {0};
+	struct tx_desc td = {0,0,0,0,0,0,0};
 	while(1){
 		req = ipc_recv((int32_t*)&whom, &nsipcbuf, 0);
 		if(req < 0)
@@ -27,7 +27,9 @@ output(envid_t ns_envid)
 		}
 		if(req == NSREQ_OUTPUT){
 			td.addr = (uint32_t)nsipcbuf.pkt.jp_data;
-			td.length = MIN(nsipcbuf.pkt.jp_len, sizeof(union Nsipc) - sizeof(int));
+			//td.length = MIN(nsipcbuf.pkt.jp_len, sizeof(union Nsipc) - sizeof(int));
+			td.length = nsipcbuf.pkt.jp_len;
+			//cprintf("output: td.length = %d\n",td.length);
 			td.cmd = 9;
 			while(1){
 				r = sys_e1000_trans(&td);
